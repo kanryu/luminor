@@ -1,4 +1,4 @@
-HALIDE_BIN_PATH ?= ../Halide
+HALIDE_BIN_PATH ?= ../halide-build
 HALIDE_SRC_PATH ?= ../Halide
 LDFLAGS ?=
 BIN ?= ./bin
@@ -17,6 +17,7 @@ CXX ?= g++
 GXX ?= g++
 AS ?= as
 PYTHON ?= python3
+CP ?= cp
 
 CFLAGS += -I $(HALIDE_BIN_PATH)/include/ -I $(HALIDE_SRC_PATH)/tools/ -I $(HALIDE_SRC_PATH)/apps/support/
 CXXFLAGS += -std=c++11 -I $(HALIDE_BIN_PATH)/include/ -I $(HALIDE_SRC_PATH)/tools/ -I $(HALIDE_SRC_PATH)/apps/support/ -fopenmp
@@ -25,7 +26,16 @@ ifeq ($(UNAME), Darwin)
 CXXFLAGS += -fvisibility=hidden
 endif
 
+ifeq ($(OS), Windows_NT)
+SO_HALIDE = $(HALIDE_BIN_PATH)/bin/libHalide.dll
+LIB_HALIDE = $(HALIDE_BIN_PATH)/lib/libHalide.dll.a
+EXE = .exe
+else
+SO_HALIDE = $(HALIDE_BIN_PATH)/bin/libHalide.so
 LIB_HALIDE = $(HALIDE_BIN_PATH)/lib/libHalide.a
+EXE = 
+endif
+
 FUNCTION = luminor
 
 HALIDE_RUNTIME = halide_mingw64.a
@@ -58,15 +68,16 @@ IMAGE_IO_FLAGS = $(IMAGE_IO_LIBS) $(IMAGE_IO_CXX_FLAGS)
 
 .PHONY: clean test
 
-all: samplemain
+all: samplemain$(EXE)
 
-$(FUNCTION)_gen: $(FUNCTION)_gen.cpp $(HALIDE_SRC_PATH)/tools/GenGen.cpp $(LIB_HALIDE)
+$(FUNCTION)_gen$(EXE): $(FUNCTION)_gen.cpp $(HALIDE_SRC_PATH)/tools/GenGen.cpp $(LIB_HALIDE)
 	$(CXX) $(CXXFLAGS) -O3 -ffast-math -Wall -Werror -I. $? -o $@ $(IMAGE_IO_FLAGS) $(LDFLAGS)
 
-$(FUNCTION).o: ./$(FUNCTION)_gen
-	./$(FUNCTION)_gen -g $(FUNCTION) -o . -e h,o target=host
+$(FUNCTION).o: ./$(FUNCTION)_gen$(EXE) $(SO_HALIDE)
+	$(CP) $(SO_HALIDE) .
+	./$(FUNCTION)_gen$(EXE) -g $(FUNCTION) -o . -e h,o target=host
 
-samplemain: $(FUNCTION).o samplemain.cpp
+samplemain$(EXE): $(FUNCTION).o samplemain.cpp
 	@mkdir -p $(@D)
 	$(CXX) $(CXXFLAGS) -O3 -ffast-math -Wall -Werror -I. $? -o $@ $(IMAGE_IO_FLAGS) $(LDFLAGS)
 
@@ -74,7 +85,7 @@ clean:
 	rm -f samplemain samplemain.exe test* luminor.* luminor_gen luminor_gen.exe
 
 test: all
-	./samplemain luminor_input.png test_0_10_10.png 0 1.0 1.0
-	./samplemain luminor_input.png test_100_10_10.png 100 1.0 1.0
-	./samplemain luminor_input.png test_0_20_10.png 0 2.0 1.0
-	./samplemain luminor_input.png test_0_10_20.png 0 1.0 2.0
+	./samplemain images/rgb.png test_0_10_10.png 0 1.0 1.0
+	./samplemain images/rgb.png test_100_10_10.png 100 1.0 1.0
+	./samplemain images/rgb.png test_0_20_10.png 0 2.0 1.0
+	./samplemain images/rgb.png test_0_10_20.png 0 1.0 2.0

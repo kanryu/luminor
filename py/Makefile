@@ -1,4 +1,4 @@
-HALIDE_BIN_PATH ?= ../../Halide
+HALIDE_BIN_PATH ?= ../../halide-build
 HALIDE_SRC_PATH ?= ../../Halide
 LDFLAGS ?=
 BIN ?= ./bin
@@ -70,7 +70,7 @@ clean:
 	rm -f samplemain samplemain.exe test* luminor.*
 
 test: all
-	./samplemain luminor_input.png test_0_10_10.png 0 1.0 1.0
-	./samplemain luminor_input.png test_100_10_10.png 100 1.0 1.0
-	./samplemain luminor_input.png test_0_20_10.png 0 2.0 1.0
-	./samplemain luminor_input.png test_0_10_20.png 0 1.0 2.0
+	./samplemain ../images/rgb.png test_0_10_10.png 0 1.0 1.0
+	./samplemain ../images/rgb.png test_100_10_10.png 100 1.0 1.0
+	./samplemain ../images/rgb.png test_0_20_10.png 0 2.0 1.0
+	./samplemain ../images/rgb.png test_0_10_20.png 0 1.0 2.0

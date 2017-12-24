@@ -67,11 +67,11 @@ WITH_ALPHA=False
 def get_input_data():
 
     if GRAY:
-        image_path = os.path.join(os.path.dirname(__file__), "../../Halide/apps/images/gray.png")
+        image_path = os.path.join(os.path.dirname(__file__), "../images/gray.png")
     elif WITH_ALPHA:
-        image_path = os.path.join(os.path.dirname(__file__), "../../Halide/apps/images/rgba.png")
+        image_path = os.path.join(os.path.dirname(__file__), "../images/rgba.png")
     else:
-        image_path = os.path.join(os.path.dirname(__file__), "../../Halide/apps/images/rgb.png")
+        image_path = os.path.join(os.path.dirname(__file__), "../images/rgb.png")
 
     assert os.path.exists(image_path), \
         "Could not find %s" % image_path
