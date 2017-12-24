@@ -32,7 +32,7 @@ int luminor(struct halide_buffer_t *_input_buffer, float _brightness, float _con
     - Change the gamma value of each pixel
     - It gets brighter when it gets bigger, it gets darker when it gets smaller
     - default: 1.0, min: 0.01, max: 10.0
-- _input_buffer
+- _output_buffer
     - output bitmap, the same pixel format as _input_buffer
 
 How to use
