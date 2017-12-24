@@ -24,7 +24,7 @@ int luminor(struct halide_buffer_t *_input_buffer, float _brightness, float _con
     - input bitmap of rgb24 or gray8
 - _brightness
     - Add the value to each pixel
-    - default: 0.0, min: -128.8, max: 127.0
+    - default: 0.0, min: -128.0, max: 127.0
 - _contrast
     - Multiply each pixel by the value(the base value is 0.5(128))
     - default: 1.0, min: 0.01, max: 10.0
