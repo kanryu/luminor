@@ -8,7 +8,7 @@ Summary
 
 - A simple C/C++ language API
 - Optimized processing automatically generated with Halide language
-- It consists of C ++ source code and runtime static library
+- It consists of C/C++ header file and static library
 
 Binary Releases
 ---------------
