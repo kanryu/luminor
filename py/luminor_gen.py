@@ -30,9 +30,9 @@ def get_luminorImpl(input, b_sigma, c_sigma, g_sigma, with_alpha):
     assert input.dimensions() == 3
 
     x, y, c = Var("x"), Var("y"), Var("c")
+    v = Var("v")
 
-    px = input[x, y, c]
-    px = cast(float_t, px)
+    px = cast(float_t, v)
     px = px * (1.0/255.0)
 
     # change brightness
@@ -49,8 +49,14 @@ def get_luminorImpl(input, b_sigma, c_sigma, g_sigma, with_alpha):
 
     px = cast(uint8_t, px*255)
 
+    # look-up-table for the luminor
+    luminor_table = Func('luminor_table')
+    luminor_table[v] = px
+    luminor_table.compute_root().vectorize(v, 16)
+
     luminor = Func('luminor')
-    luminor[x, y, c] = px
+    luminor.store_root().compute_at(luminor_table, v)
+    luminor[x, y, c] = luminor_table[input[x, y, c]]
 
     # for RGBA pixels, Alpha is not modified
     if with_alpha:

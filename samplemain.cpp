@@ -2,7 +2,16 @@
 #include <cstdlib>
 #include <cassert>
 
+#ifdef RUN_RGBA
+#include "luminor_rgba.h"
+#define LUMINOR_API luminor_rgba
+#define SAMPLEMAIN "samplemain_rgba"
+#else
 #include "luminor.h"
+#define LUMINOR_API luminor
+#define SAMPLEMAIN "samplemain"
+#endif
+
 
 #include "halide_benchmark.h"
 #include "HalideBuffer.h"
@@ -13,8 +22,8 @@ using namespace Halide::Runtime;
 
 int main(int argc, char **argv) {
     if (argc < 5) {
-        printf("Usage: ./samplemain input.png output.png b_sigma, c_sigma, g_sigma\n"
-               "e.g. ./samplemain input.png output.png 0, 1.0, 1.0\n");
+        printf("Usage: ./" SAMPLEMAIN " input.png output.png b_sigma, c_sigma, g_sigma\n"
+               "e.g. ./" SAMPLEMAIN " input.png output.png 0, 1.0, 1.0\n");
         return 0;
     }
 
@@ -25,7 +34,7 @@ int main(int argc, char **argv) {
     Buffer<uint8_t> input = load_and_convert_image(argv[1]);
     Buffer<uint8_t> output(input.width(), input.height(), 3);
 
-    luminor(input, b_sigma, c_sigma, g_sigma, output);
+    LUMINOR_API(input, b_sigma, c_sigma, g_sigma, output);
 
     // Timing code. Timing doesn't include copying the input data to
     // the gpu or copying the output back.
@@ -33,7 +42,7 @@ int main(int argc, char **argv) {
     // Manually-tuned version
     int times = 10;
     double min_t_manual = benchmark(1, times, [&]() {
-        luminor(input, b_sigma, c_sigma, g_sigma, output);
+        LUMINOR_API(input, b_sigma, c_sigma, g_sigma, output);
     });
     printf("Manually-tuned time: %gms in %d times\n", min_t_manual * 1e3, times);
 

@@ -1,6 +1,6 @@
 
-ARCH=x86
-#ARCH=x64
+#ARCH=x86
+ARCH=x64
 HALIDE_BIN_PATH = E:\local\gnu\halide-20171030\$(ARCH)
 HALIDE_SRC_PATH = ../../Halide
 BIN = ./bin
@@ -37,7 +37,19 @@ IMAGE_IO_LIBS = $(LIBPNG_LIBS) $(LIBJPEG_LIBS)
 all: samplemain.exe
 
 clean:
-	rm -f *.obj samplemain samplemain.exe test* luminor.* luminor_gen luminor_gen.exe
+	rm -f *.obj samplemain samplemain.exe samplemain_rgba samplemain_rgba.exe test* luminor.* luminor_rgba.* luminor_gen luminor_gen.exe Halide.dll
+
+$(FUNCTION)_gen.exe: ../$(FUNCTION)_gen.cpp $(HALIDE_SRC_PATH)/tools/GenGen.cpp
+	$(CXX) $(CXXFLAGS)  -I. $? $(LIB_HALIDE)
+
+Halide.dll: $(HALIDE_BIN_PATH)/Release/Halide.dll
+	cp $? .
+
+$(FUNCTION).lib: $(FUNCTION)_gen.exe Halide.dll
+	$(FUNCTION)_gen -g $(FUNCTION) -o . target=host
+
+samplemain.exe: ../samplemain.cpp $(FUNCTION).lib
+	$(CXX) $(CXXFLAGS) -I. $? $(IMAGE_IO_CXX_FLAGS) $(IMAGE_IO_LIBS)
 
 test: all
 	samplemain ../images/rgb.png test_0_10_10.png 0 1.0 1.0
@@ -45,17 +57,14 @@ test: all
 	samplemain ../images/rgb.png test_0_20_10.png 0 2.0 1.0
 	samplemain ../images/rgb.png test_0_10_20.png 0 1.0 2.0
 
-$(FUNCTION)_gen.exe: ../$(FUNCTION)_gen.cpp $(HALIDE_SRC_PATH)/tools/GenGen.cpp
-	$(CXX) $(CXXFLAGS)  -I. $? $(LIB_HALIDE)
-#	echo $(LD) $(LDFLAGS) -out:$@ $(FUNCTION)_gen.obj GenGen.obj $(IMAGE_IO_LIBS)  $(LIB_HALIDE)
-#	$(LD) $(LDFLAGS) -out:$@ $(FUNCTION)_gen.obj GenGen.obj $(IMAGE_IO_LIBS)  $(LIB_HALIDE)
+$(FUNCTION)_rgba.lib: $(FUNCTION)_gen.exe Halide.dll
+	$(FUNCTION)_gen -g $(FUNCTION)_rgba -o . target=host
 
-Halide.dll: $(HALIDE_BIN_PATH)/Release/Halide.dll
-	copy $? .
+samplemain_rgba.exe: ../samplemain.cpp $(FUNCTION)_rgba.lib
+	$(CXX) /DRUN_RGBA  $(CXXFLAGS) -I. $? $(IMAGE_IO_CXX_FLAGS) $(IMAGE_IO_LIBS) /link /OUT:$@
 
-$(FUNCTION).lib: $(FUNCTION)_gen.exe Halide.dll
-	$(FUNCTION)_gen -g $(FUNCTION) -o . target=host
-
-samplemain.exe: ../samplemain.cpp $(FUNCTION).lib
-	$(CXX) $(CXXFLAGS) -I. $? $(IMAGE_IO_CXX_FLAGS) $(IMAGE_IO_LIBS)
-#	$(LD) $(LDFLAGS) -out:$@ $(FUNCTION).lib samplemain.obj $(IMAGE_IO_LIBS) $(FUNCTION).lib
+testA: samplemain_rgba.exe
+	samplemain_rgba ../images/rgba.png testa_0_10_10.png 0 1.0 1.0
+	samplemain_rgba ../images/rgba.png testa_100_10_10.png 100 1.0 1.0
+	samplemain_rgba ../images/rgba.png testa_0_20_10.png 0 2.0 1.0
+	samplemain_rgba ../images/rgba.png testa_0_10_20.png 0 1.0 2.0
