@@ -22,6 +22,7 @@ int luminor(struct halide_buffer_t *_input_buffer, float _brightness, float _con
 
 - _input_buffer
     - input bitmap of rgb24 or gray8
+    - gray8 should be initialized as Buffer(width, height, 1)
 - _brightness
     - Add the value to each pixel
     - default: 0.0, min: -128.0, max: 127.0
@@ -34,6 +35,13 @@ int luminor(struct halide_buffer_t *_input_buffer, float _brightness, float _con
     - default: 1.0, min: 0.01, max: 10.0
 - _output_buffer
     - output bitmap, the same pixel format as _input_buffer
+
+int luminor_rgba(struct halide_buffer_t *_input_buffer, float _brightness, float _contrast, float _gamma, struct halide_buffer_t *_output_buffer)
+
+- _input_buffer
+    - input bitmap of rgba32
+    - alpha byte must be at 4th byte of each pixel
+
 
 How to use
 ------------
