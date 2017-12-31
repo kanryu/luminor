@@ -1,7 +1,7 @@
 Luminor
 =============
 
-A simple library that changes the brightness, contrast, and gamma value of on-memory images in real time
+A simple and fast library that changes the brightness, contrast, and gamma value of on-memory images in real time.
 
 Summary
 -------
