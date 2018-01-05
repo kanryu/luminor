@@ -22,7 +22,7 @@ int luminor(struct halide_buffer_t *_input_buffer, float _brightness, float _con
 
 - _input_buffer
     - input bitmap of rgb24 or gray8
-    - gray8 should be initialized as Buffer(width, height, 1)
+    - gray8 should be initialized as 3D Buffer(width, height, 1)
 - _brightness
     - Add the value to each pixel
     - default: 0.0, min: -128.0, max: 127.0
