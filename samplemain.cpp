@@ -6,10 +6,12 @@
 #include "luminor_rgba.h"
 #define LUMINOR_API luminor_rgba
 #define SAMPLEMAIN "samplemain_rgba"
+#define COLORS 4
 #else
 #include "luminor.h"
 #define LUMINOR_API luminor
 #define SAMPLEMAIN "samplemain"
+#define COLORS 3
 #endif
 
 
@@ -32,7 +34,7 @@ int main(int argc, char **argv) {
     float g_sigma = (float) atof(argv[5]);
 
     Buffer<uint8_t> input = load_and_convert_image(argv[1]);
-    Buffer<uint8_t> output(input.width(), input.height(), 3);
+    Buffer<uint8_t> output(input.width(), input.height(), COLORS);
 
     LUMINOR_API(input, b_sigma, c_sigma, g_sigma, output);
 
