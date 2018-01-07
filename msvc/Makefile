@@ -37,7 +37,7 @@ IMAGE_IO_LIBS = $(LIBPNG_LIBS) $(LIBJPEG_LIBS)
 all: samplemain.exe
 
 clean:
-	rm -f *.obj samplemain samplemain.exe samplemain_rgba samplemain_rgba.exe test* luminor.* luminor_rgba.* luminor_gen luminor_gen.exe Halide.dll
+	rm -f *.obj samplemain samplemain.exe samplemain_rgba samplemain_rgba.exe test* luminor.* luminor_rgba.* luminor_gen luminor_gen.exe Halide.dll halide_runtime.lib
 
 $(FUNCTION)_gen.exe: ../$(FUNCTION)_gen.cpp $(HALIDE_SRC_PATH)/tools/GenGen.cpp
 	$(CXX) $(CXXFLAGS)  -I. $? $(LIB_HALIDE)
@@ -46,9 +46,12 @@ Halide.dll: $(HALIDE_BIN_PATH)/Release/Halide.dll
 	cp $? .
 
 $(FUNCTION).lib: $(FUNCTION)_gen.exe Halide.dll
-	$(FUNCTION)_gen -g $(FUNCTION) -o . target=host
+	$(FUNCTION)_gen -g $(FUNCTION) -o . target=host-no_runtime
 
-samplemain.exe: ../samplemain.cpp $(FUNCTION).lib
+halide_runtime.lib: $(FUNCTION)_gen.exe Halide.dll
+	$(FUNCTION)_gen -r halide_runtime -o . target=host
+
+samplemain.exe: ../samplemain.cpp $(FUNCTION).lib halide_runtime.lib
 	$(CXX) $(CXXFLAGS) -I. $? $(IMAGE_IO_CXX_FLAGS) $(IMAGE_IO_LIBS)
 
 test: all
@@ -58,9 +61,9 @@ test: all
 	samplemain ../images/rgb.png test_0_10_20.png 0 1.0 2.0
 
 $(FUNCTION)_rgba.lib: $(FUNCTION)_gen.exe Halide.dll
-	$(FUNCTION)_gen -g $(FUNCTION)_rgba -o . target=host
+	$(FUNCTION)_gen -g $(FUNCTION)_rgba -o . target=host-no_runtime
 
-samplemain_rgba.exe: ../samplemain.cpp $(FUNCTION)_rgba.lib
+samplemain_rgba.exe: ../samplemain.cpp $(FUNCTION)_rgba.lib halide_runtime.lib
 	$(CXX) /DRUN_RGBA  $(CXXFLAGS) -I. $? $(IMAGE_IO_CXX_FLAGS) $(IMAGE_IO_LIBS) /link /OUT:$@
 
 testA: samplemain_rgba.exe
