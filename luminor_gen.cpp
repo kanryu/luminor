@@ -1,5 +1,7 @@
 #include "Halide.h"
 
+#ifndef BUILD_RGBA
+
 namespace {
 
 	class Luminor : public Halide::Generator<Luminor> {
@@ -11,13 +13,11 @@ namespace {
 
 
 		Output<Buffer<uint8_t>> luminor{ "output", 3 };
-//	Output<Buffer<uint8_t>>	luminorTable{ 1 };
 
 		void generate() {
 			Var x("x"), y("y"), z("z"), c("c");
 		    Var v("v");
 
-//			Expr px = input(x, y, c);
 		    Expr px = cast<float_t>(v);
 			
 			// change brightness
@@ -41,7 +41,6 @@ namespace {
 			luminorTable.compute_root().vectorize(v, 16);
 
 			// Construct the luminor
-//			Func luminor("luminor");
 			luminor.store_root().compute_at(luminorTable, v);
 			luminor(x, y, c) = luminorTable(input(x, y, c));
 
@@ -49,7 +48,15 @@ namespace {
 			luminor.compute_root().parallel(y).vectorize(x, 16);
 		}
 	};
-	class LuminorRGBA : public Halide::Generator<Luminor> {
+}  // namespace
+
+HALIDE_REGISTER_GENERATOR(Luminor, luminor)
+
+#else
+
+namespace {
+
+	class LuminorRGBA : public Halide::Generator<LuminorRGBA> {
 	public:
 		Input<Buffer<uint8_t>>  input{ "input", 3 };
 		Input<float>   b_sigma{ "brightness", 0.0 };
@@ -58,13 +65,11 @@ namespace {
 
 
 		Output<Buffer<uint8_t>> luminor_rgba{ "output", 3 };
-//Output<Buffer<uint8_t>>	luminorTable{  1 };
 
 		void generate() {
 			Var x("x"), y("y"), z("z"), c("c");
 		    Var v("v");
 
-//			Expr px = input(x, y, c);
 		    Expr px = cast<float_t>(v);
 			
 			// change brightness
@@ -89,9 +94,8 @@ namespace {
 
 			// Construct the luminor
 			luminor_rgba.store_root().compute_at(luminorTable, v);
-			luminor_rgba(x, y, c) = luminorTable(input(x, y, c));
-			luminor_rgba(x, y, 3) = input(x, y, 3);
-
+			luminor_rgba(x, y, c) = select(c==3, input(x, y, 3), 
+											     luminorTable(input(x, y, c)));
 
 			// The CPU schedule.
 			luminor_rgba.compute_root().parallel(y).vectorize(x, 16);
@@ -100,5 +104,6 @@ namespace {
 
 }  // namespace
 
-HALIDE_REGISTER_GENERATOR(Luminor, luminor)
 HALIDE_REGISTER_GENERATOR(LuminorRGBA, luminor_rgba)
+#endif
+
