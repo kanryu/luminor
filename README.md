@@ -10,6 +10,8 @@ Summary
 - Optimized processing automatically generated with Halide language
 - It consists of C/C++ header file and static library
 
+These is a part of [QuickViewer](https://github.com/kanryu/quickviewer).
+
 Binary Releases
 ---------------
 https://github.com/kanryu/luminor/releases
