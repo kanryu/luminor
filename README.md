@@ -50,6 +50,9 @@ How to use
 
 Only to include **luminor.h**, **HalideBuffer.h**  and link **luminor.a**, the API will work.
 
+Details to see https://github.com/kanryu/quickviewer/blob/master/luminor/qluminor.cpp
+
+
 How to build
 ------------
 
