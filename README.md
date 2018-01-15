@@ -11,7 +11,7 @@ Summary
     - The processing is completed in approximately 100 of the time of the normal implementation.
     　  - Measured with i7-2600@3.4 GHz (built by gcc-7.2.0 CFLAGS=-O3)
         - 100 times without LUT, 2.9 times with LUT
-    - e.g. https://github.com/FFmpeg/FFmpeg/blob/master/libavfilter/vf_eq.c
+        - e.g. https://github.com/FFmpeg/FFmpeg/blob/master/libavfilter/vf_eq.c
 - It consists of C/C++ header file and static library
 
 These is a part of [QuickViewer](https://github.com/kanryu/quickviewer).
