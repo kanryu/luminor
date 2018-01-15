@@ -6,7 +6,7 @@ A simple and fast library that changes the brightness, contrast, and gamma value
 Summary
 -------
 
-- A simple C/C++ language API
+- Simple C/C++ language API
 - Optimized processing automatically generated with Halide language
     - The processing is completed in approximately 100 of the time of the normal implementation.
         - Measured with i7-2600@3.4 GHz (built by gcc-7.2.0 CFLAGS=-O3)
