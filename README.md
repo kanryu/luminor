@@ -8,6 +8,8 @@ Summary
 
 - A simple C/C++ language API
 - Optimized processing automatically generated with Halide language
+    - The processing is completed in approximately 100 of the time of the normal implementation.
+    - e.g. https://github.com/FFmpeg/FFmpeg/blob/master/libavfilter/vf_eq.c
 - It consists of C/C++ header file and static library
 
 These is a part of [QuickViewer](https://github.com/kanryu/quickviewer).
