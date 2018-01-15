@@ -69,6 +69,23 @@ And,
 
     $ make
 
+Files
+-----
+
+- images/
+    - test images
+- msvc/
+    - Makefile for nmake
+- msvc_sln/
+    - solution/project for Visual Studio 2015
+- py/
+    - for Python3 and python_bindings for Halide language
+- luminor_gen.cpp
+    - library generator for luminor(), luminor_rgba()
+- samplemain.cpp
+    - sample program for luminor/luninor_rgba
+    - currently luminor_rgba is not supported
+
 License
 -------
 MIT
@@ -76,4 +93,4 @@ MIT
 Author
 ------
 
-Copyright (c) 2017, KATO Kanryu
+Copyright (c) 2017, KATO Kanryu(k.kanryu@gmail.com)
