@@ -46,6 +46,7 @@ int luminor_rgba(struct halide_buffer_t *_input_buffer, float _brightness, float
 - _input_buffer
     - input bitmap of rgba32
     - alpha byte must be at 4th byte of each pixel
+    - need to call Buffer::make_interleaved() to prepare buffers
 
 
 How to use
