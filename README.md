@@ -14,7 +14,7 @@ Summary
         - e.g. https://github.com/FFmpeg/FFmpeg/blob/master/libavfilter/vf_eq.c
 - It consists of C/C++ header file and static library
 
-These is a part of [QuickViewer](https://github.com/kanryu/quickviewer).
+This is a part of [QuickViewer](https://github.com/kanryu/quickviewer).
 
 Binary Releases
 ---------------
