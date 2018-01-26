@@ -1,7 +1,7 @@
 Luminor
 =============
 
-A simple and fast library that changes the brightness, contrast, and gamma value of on-memory images in real time.
+A simple and fast library that changes the brightness, contrast, and gamma value of on-memory images in real time generated with [Halide](https://github.com/halide/Halide) language.
 
 Summary
 -------
