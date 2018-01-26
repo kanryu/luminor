@@ -1,4 +1,4 @@
-HALIDE_BIN_PATH ?= ../halide-build
+HALIDE_BIN_PATH ?= ../Halide
 HALIDE_SRC_PATH ?= ../Halide
 LDFLAGS ?=
 BIN ?= ./bin
@@ -30,15 +30,18 @@ ifeq ($(OS), Windows_NT)
 SO_HALIDE = $(HALIDE_BIN_PATH)/bin/libHalide.dll
 LIB_HALIDE = $(HALIDE_BIN_PATH)/lib/libHalide.dll.a
 EXE = .exe
+HALIDE_RUNTIME = halide_mingw64.a
 else
-SO_HALIDE = $(HALIDE_BIN_PATH)/bin/libHalide.so
-LIB_HALIDE = $(HALIDE_BIN_PATH)/lib/libHalide.a
+SO_HALIDE =
+LIB_HALIDE =  $(HALIDE_BIN_PATH)/lib/libHalide.a
 EXE = 
+HALIDE_RUNTIME = halide_linux64.a
+CXXFLAGS += -fno-rtti
+#GEN_LDFLAGS = -L$(HALIDE_BIN_PATH)/lib -lHalide
 endif
 
 FUNCTION = luminor
 
-HALIDE_RUNTIME = halide_mingw64.a
 
 LIBPNG_LIBS_DEFAULT = $(shell libpng-config --ldflags)
 LIBPNG_CXX_FLAGS ?= $(shell libpng-config --cflags)
@@ -71,21 +74,44 @@ IMAGE_IO_FLAGS = $(IMAGE_IO_LIBS) $(IMAGE_IO_CXX_FLAGS)
 all: samplemain$(EXE)
 
 $(FUNCTION)_gen$(EXE): $(FUNCTION)_gen.cpp $(HALIDE_SRC_PATH)/tools/GenGen.cpp $(LIB_HALIDE)
-	$(CXX) $(CXXFLAGS) -O3 -ffast-math -Wall -Werror -I. $? -o $@ $(IMAGE_IO_FLAGS) $(LDFLAGS)
+	$(CXX) $(CXXFLAGS) -O3 -ffast-math -Wall -Werror -I. $? -o $@ $(IMAGE_IO_FLAGS) $(LDFLAGS) $(GEN_LDFLAGS)
+
+
+halide_runtime.a: $(FUNCTION)_gen$(EXE)
+	./$(FUNCTION)_gen -r halide_runtime -o . target=host
 
 $(FUNCTION).o: ./$(FUNCTION)_gen$(EXE) $(SO_HALIDE)
-	$(CP) $(SO_HALIDE) .
-	./$(FUNCTION)_gen$(EXE) -g $(FUNCTION) -o . -e h,o target=host
+#	$(CP) $(SO_HALIDE) .
+	./$(FUNCTION)_gen$(EXE) -g $(FUNCTION) -o . -e h,o target=host-no_runtime
 
-samplemain$(EXE): $(FUNCTION).o samplemain.cpp
+samplemain$(EXE): $(FUNCTION).o samplemain.cpp halide_runtime.a
 	@mkdir -p $(@D)
 	$(CXX) $(CXXFLAGS) -O3 -ffast-math -Wall -Werror -I. $? -o $@ $(IMAGE_IO_FLAGS) $(LDFLAGS)
 
+$(FUNCTION)_gen_rgba$(EXE): $(FUNCTION)_gen.cpp $(HALIDE_SRC_PATH)/tools/GenGen.cpp $(LIB_HALIDE)
+	$(CXX) $(CXXFLAGS)  -DBUILD_RGBA -O3 -ffast-math -Wall -Werror -I. $? -o $@ $(IMAGE_IO_FLAGS) $(LDFLAGS) $(GEN_LDFLAGS)
+
+	
+$(FUNCTION)_rgba.o: ./$(FUNCTION)_gen_rgba$(EXE) $(SO_HALIDE)
+#	$(CP) $(SO_HALIDE) .
+	./$(FUNCTION)_gen_rgba$(EXE) -g $(FUNCTION)_rgba -o . -e h,o target=host-no_runtime
+
+samplemain_rgba$(EXE): $(FUNCTION)_rgba.o samplemain.cpp halide_runtime.a
+	@mkdir -p $(@D)
+	$(CXX) $(CXXFLAGS) -DRUN_RGBA -O3 -ffast-math -Wall -Werror -I. $? -o $@ $(IMAGE_IO_FLAGS) $(LDFLAGS)
+
 clean:
-	rm -f samplemain samplemain.exe test* luminor.* luminor_gen luminor_gen.exe
+	rm -f samplemain samplemain.exe test* luminor.* luminor_gen luminor_gen.exe halide_runtime.a
 
 test: all
 	./samplemain images/rgb.png test_0_10_10.png 0 1.0 1.0
 	./samplemain images/rgb.png test_100_10_10.png 100 1.0 1.0
 	./samplemain images/rgb.png test_0_20_10.png 0 2.0 1.0
 	./samplemain images/rgb.png test_0_10_20.png 0 1.0 2.0
+
+testA: samplemain_rgba$(EXE)
+	./samplemain_rgba images/rgba.png testa_0_10_10.png 0 1.0 1.0
+	./samplemain_rgba images/rgba.png testa_100_10_10.png 100 1.0 1.0
+	./samplemain_rgba images/rgba.png testa_0_20_10.png 0 2.0 1.0
+	./samplemain_rgba images/rgba.png testa_0_10_20.png 0 1.0 2.0
+	./samplemain_rgba images/rgba.png testa_-100_10_10.png -100 1.0 1.0
